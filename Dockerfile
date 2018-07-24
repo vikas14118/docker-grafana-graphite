@@ -7,7 +7,7 @@ FROM   alpine
 # Install all prerequisites
 RUN     apk add --update --no-cache nginx nodejs nodejs-npm git curl wget gcc ca-certificates \
                                     python-dev py-pip musl-dev libffi-dev cairo supervisor bash \
-                                    py-pyldap py-rrd                                                                 &&\
+                                    py-pyldap py-rrd postfix busybox-extras                                          &&\
         wget -q -O /etc/apk/keys/sgerrand.rsa.pub \
                     https://raw.githubusercontent.com/sgerrand/alpine-pkg-glibc/master/sgerrand.rsa.pub              &&\
         wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.26-r0/glibc-2.26-r0.apk                &&\
@@ -43,7 +43,7 @@ RUN     git clone --depth=1 --branch master https://github.com/etsy/statsd.git /
 # Install Grafana
 RUN     mkdir /src/grafana                                                                                           &&\
         mkdir /opt/grafana                                                                                           &&\
-        curl https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana-4.6.3.linux-x64.tar.gz \
+        curl https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana-5.1.0.linux-x64.tar.gz \
              -o /src/grafana.tar.gz                                                                                  &&\
         tar -xzf /src/grafana.tar.gz -C /opt/grafana --strip-components=1                                            &&\
         rm /src/grafana.tar.gz
@@ -76,6 +76,8 @@ RUN     mkdir -p /opt/graphite/storage/whisper                                  
         cd /opt/graphite/webapp/ && python manage.py migrate --run-syncdb --noinput
 
 # Configure Grafana and wizzy
+RUN     mkdir -p /etc/grafana
+ADD     ./grafana/custom.ini /etc/grafana/grafana.ini
 ADD     ./grafana/custom.ini /opt/grafana/conf/custom.ini
 RUN     cd /src                                                                                                      &&\
         wizzy init                                                                                                   &&\
