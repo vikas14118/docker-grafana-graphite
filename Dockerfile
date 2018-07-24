@@ -18,6 +18,15 @@ RUN     apk add --update --no-cache nginx nodejs nodejs-npm git curl wget gcc ca
         npm install -g wizzy                                                                                         &&\
         npm cache clean --force
 
+
+RUN 	mkdir -p /etc/resolvconf/resolv.conf.d
+RUN	> /etc/resolvconf/resolv.conf.d/base
+RUN 	> /etc/resolvconf/resolv.conf.d/head
+RUN     echo "nameserver 10.14.155.200" >> /etc/resolvconf/resolv.conf.d/base
+RUN     echo "nameserver 10.14.67.100" >> /etc/resolvconf/resolv.conf.d/base
+RUN     echo "nameserver 10.14.155.100" >> /etc/resolvconf/resolv.conf.d/base
+
+
 # Checkout the master branches of Graphite, Carbon and Whisper and install from there
 RUN     mkdir /src                                                                                                   &&\
         git clone --depth=1 --branch master https://github.com/graphite-project/whisper.git /src/whisper             &&\
@@ -51,7 +60,6 @@ RUN     mkdir /src/grafana                                                      
 
 # Cleanup Compile Dependencies
 RUN     apk del --no-cache git curl wget gcc python-dev musl-dev libffi-dev
-
 
 # ----------------- #
 #   Configuration   #
